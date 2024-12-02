@@ -6,30 +6,17 @@ fn main() {
     let mut left: Vec<u32> = Vec::new();
     let mut right: Vec<u32> = Vec::new();
 
-    data.lines()
-        .map(|v| {
-            v.split_whitespace()
-                .map(|v| v.parse::<u32>().unwrap())
-                .collect()
-        })
-        .for_each(|v: Vec<u32>| {
-            left.push(v[0]);
-            right.push(v[1]);
-        });
+    data.lines().for_each(|line| {
+        let mut nums = line.split_whitespace().map(|v| v.parse::<u32>().unwrap());
+        left.push(nums.next().unwrap());
+        right.push(nums.next().unwrap());
+    });
 
     left.sort();
     right.sort();
 
-    let sum: u32 = left
-        .iter()
-        .zip(right.iter())
-        .map(|(left_var, right_var)| {
-            if left_var > right_var {
-                left_var - right_var
-            } else {
-                right_var - left_var
-            }
-        })
+    let sum: u32 = std::iter::zip(left, right)
+        .map(|(left_var, right_var)| left_var.abs_diff(right_var))
         .sum();
 
     println!("{}", sum);
