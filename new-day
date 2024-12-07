@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DAY=$1
+
+cp -r template day$DAY
+sed -i "s/template/day$DAY/g" \
+    day$DAY/Cargo.toml \
+    day$DAY/Cargo.lock \
+    day$DAY/src/bin/part1.rs \
+    day$DAY/src/bin/part2.rs
