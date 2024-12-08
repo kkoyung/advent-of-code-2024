@@ -1,5 +1,12 @@
+// use template::*;
 use std::fs;
-use template::*;
+
+fn process(input: &str) -> usize {
+    // Write here
+    input.len()
+}
+
+// =====================================================================
 
 fn main() {
     println!("Part 2");
@@ -8,18 +15,13 @@ fn main() {
     println!("{}", process(input.as_str()));
 }
 
-fn process(input: &str) -> usize {
-    // Write here
-    input.len()
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::process;
-    use template::INPUT;
+    use super::process;
+    use template::{INPUT2, OUTPUT2};
 
     #[test]
     fn test_example() {
-        assert_eq!(process(INPUT), 0);
+        assert_eq!(process(INPUT2), OUTPUT2);
     }
 }

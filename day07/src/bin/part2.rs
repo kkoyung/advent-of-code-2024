@@ -1,13 +1,6 @@
 // use day07::*;
 use std::fs;
 
-fn main() {
-    println!("Part 2");
-
-    let input = fs::read_to_string("input").expect("Unable to read file");
-    println!("{}", process(input.as_str()));
-}
-
 fn process(input: &str) -> usize {
     input
         .lines()
@@ -75,13 +68,22 @@ fn check(test_value: &usize, nums_stack: &[usize]) -> bool {
     false
 }
 
+// =====================================================================
+
+fn main() {
+    println!("Part 2");
+
+    let input = fs::read_to_string("input").expect("Unable to read file");
+    println!("{}", process(input.as_str()));
+}
+
 #[cfg(test)]
 mod tests {
     use crate::process;
-    use day07::INPUT;
+    use day07::{INPUT2, OUTPUT2};
 
     #[test]
     fn test_example() {
-        assert_eq!(process(INPUT), 11387);
+        assert_eq!(process(INPUT2), OUTPUT2);
     }
 }

@@ -1,9 +1,16 @@
-// use template::*;
+use day02::*;
 use std::fs;
 
 fn process(input: &str) -> usize {
-    // Write here
-    input.len()
+    input
+        .lines()
+        .map(|line| {
+            line.split_whitespace()
+                .map(|v| v.parse::<i32>().unwrap())
+                .collect::<Vec<i32>>()
+        })
+        .filter(|nums| is_safe(&nums[..]))
+        .count()
 }
 
 // =====================================================================
@@ -18,7 +25,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::process;
-    use template::{INPUT1, OUTPUT1};
+    use day02::{INPUT1, OUTPUT1};
 
     #[test]
     fn test_example() {

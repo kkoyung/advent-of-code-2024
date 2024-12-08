@@ -5,9 +5,10 @@ This repository contains my solutions to [Advent of Code 2024](https://adventofc
 I chose Rust as the programming language to write my solutions to improve my Rust skills.
 Some codes may use the functional programming features extensively, in order to force myself to get familiar with them.
 
-Two puzzles are posted each day in the Advent calendar.
-The solution to each puzzle is placed in a separate subdirectory.
-For example, the first puzzle of day 2 is placed in `day02a` and the second puzzle of day 2 is placed in `day02b`.
+The solutions for puzzles are stored in different directories according to the day, e.g. `day01`.
+Within the directory of each day, solutions of part 1 and part 2 are placed at `src/bin/part1.rs` and `src/bin/part2.rs`, respectively.
+Common parts are placed at `src/lib.rs`.
+Examples of input/output are also placed in `src/lib.rs`, and they are used to check the code by using the test modules.
 
 If you find that the code doesn't work, or you'd like to discuss the code with me, feel free to open an issue in this GitHub repository or email me (kingsley@kkoyung.dev).
 

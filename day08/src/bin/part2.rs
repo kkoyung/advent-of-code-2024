@@ -90,6 +90,8 @@ fn find_antinodes_of_pairs(
     antinodes
 }
 
+// =====================================================================
+//
 fn main() {
     println!("Part 2");
 
@@ -99,11 +101,11 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::process;
-    use day08::INPUT;
+    use super::process;
+    use day08::{INPUT2, OUTPUT2};
 
     #[test]
     fn test_example() {
-        assert_eq!(process(INPUT), 34);
+        assert_eq!(process(INPUT2), OUTPUT2);
     }
 }

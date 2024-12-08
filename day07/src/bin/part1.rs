@@ -1,13 +1,6 @@
 // use day07::*;
 use std::fs;
 
-fn main() {
-    println!("Part 1");
-
-    let input = fs::read_to_string("input").expect("Unable to read file");
-    println!("{}", process(input.as_str()));
-}
-
 fn process(input: &str) -> usize {
     input
         .lines()
@@ -42,18 +35,18 @@ fn check(test_value: &usize, nums_stack: &[usize]) -> bool {
     }
 
     let length = nums_stack.len();
-    let last_one = nums_stack[length-1];
-    let last_two = nums_stack[length-2];
+    let last_one = nums_stack[length - 1];
+    let last_two = nums_stack[length - 2];
 
     // Try adding last two numbers
-    let mut addition_stack = Vec::from(&nums_stack[0..length-2]);
+    let mut addition_stack = Vec::from(&nums_stack[0..length - 2]);
     addition_stack.push(last_one + last_two);
     if check(test_value, &addition_stack) {
         return true;
     }
 
     // Try multiplying last two numbers
-    let mut multiplication_stack = Vec::from(&nums_stack[0..length-2]);
+    let mut multiplication_stack = Vec::from(&nums_stack[0..length - 2]);
     multiplication_stack.push(last_one * last_two);
     if check(test_value, &multiplication_stack) {
         return true;
@@ -62,13 +55,22 @@ fn check(test_value: &usize, nums_stack: &[usize]) -> bool {
     false
 }
 
+// =====================================================================
+
+fn main() {
+    println!("Part 1");
+
+    let input = fs::read_to_string("input").expect("Unable to read file");
+    println!("{}", process(input.as_str()));
+}
+
 #[cfg(test)]
 mod tests {
     use crate::process;
-    use day07::INPUT;
+    use day07::{INPUT1, OUTPUT1};
 
     #[test]
     fn test_example() {
-        assert_eq!(process(INPUT), 3749);
+        assert_eq!(process(INPUT1), OUTPUT1);
     }
 }

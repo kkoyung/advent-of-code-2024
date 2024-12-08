@@ -1,4 +1,4 @@
-pub const INPUT: &str = "190: 10 19
+pub const INPUT1: &str = "190: 10 19
 3267: 81 40 27
 83: 17 5
 156: 15 6
@@ -7,3 +7,7 @@ pub const INPUT: &str = "190: 10 19
 192: 17 8 14
 21037: 9 7 18 13
 292: 11 6 16 20";
+pub const OUTPUT1: usize = 3749;
+
+pub const INPUT2: &str = INPUT1;
+pub const OUTPUT2: usize = 11387;
