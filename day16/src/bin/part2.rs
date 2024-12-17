@@ -1,45 +1,55 @@
-// use day16::*;
-use std::fs;
-
-type Map = Vec<Vec<char>>;
-type Position = (usize, usize);
+use day16::*;
+use std::{
+    collections::{BTreeSet, HashSet},
+    fs,
+};
 
 fn process(input: &str) -> usize {
-    let (_map, _start_position, _end_position) = parse_input(input);
-    0
-}
+    let (map, start_position, end_position) = parse_input(input);
 
-fn parse_input(input: &str) -> (Map, Position, Position) {
-    let map = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<char>>())
-        .collect::<Map>();
+    let mut heads: BTreeSet<Head> = BTreeSet::new();
+    heads.insert(Head {
+        score: 0,
+        position: start_position,
+        direction: Direction::East,
+        track: vec![start_position],
+    });
+    let mut finished_heads: Vec<Head> = Vec::new();
 
-    let start_position = map
+    let mut score_map: Vec<Vec<usize>> = vec![vec![usize::MAX - 1000; map[0].len()]; map.len()];
+
+    while let Some(head) = heads.pop_first() {
+        step_over(&map, &head)
+            .into_iter()
+            .filter(|head| {
+                if head.score <= score_map[head.position.0][head.position.1] {
+                    score_map[head.position.0][head.position.1] = head.score;
+                    true
+                } else {
+                    head.score <= score_map[head.position.0][head.position.1] + 1000
+                    // Not ideal workaround. It make this program run much longer.
+                }
+            })
+            .filter(|head| {
+                if head.position == end_position {
+                    finished_heads.push(head.clone());
+                    false
+                } else {
+                    true
+                }
+            })
+            .for_each(|head| {
+                heads.insert(head);
+            });
+    }
+
+    let best_score = finished_heads.iter().map(|head| head.score).min().unwrap();
+    finished_heads
         .iter()
-        .enumerate()
-        .flat_map(|(i, row)| {
-            row.iter()
-                .enumerate()
-                .map(move |(j, value)| ((i, j), value))
-        })
-        .find(|(_position, character)| **character == 'S')
-        .unwrap()
-        .0;
-
-    let end_position = map
-        .iter()
-        .enumerate()
-        .flat_map(|(i, row)| {
-            row.iter()
-                .enumerate()
-                .map(move |(j, value)| ((i, j), value))
-        })
-        .find(|(_position, character)| **character == 'E')
-        .unwrap()
-        .0;
-
-    (map, start_position, end_position)
+        .filter(|head| head.score == best_score)
+        .flat_map(|head| head.track.clone())
+        .collect::<HashSet<Position>>()
+        .len()
 }
 
 // =====================================================================
