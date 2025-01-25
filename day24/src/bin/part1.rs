@@ -2,9 +2,9 @@ use day24::*;
 use std::fs;
 
 fn process(input: &str) -> usize {
-    let (mut wires_states, gates) = parse_input(input);
-    run_gates(&mut wires_states, &gates);
-    wires_to_number(&wires_states, "z")
+    let (_wires, gates, init_assignment) = parse_input(input);
+    let (assignment, _gate_sequence) = run_gates(&gates, &init_assignment);
+    wires_to_number(&assignment, "z")
 }
 
 // =====================================================================

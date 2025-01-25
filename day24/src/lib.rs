@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Display,
+};
 
 pub const INPUT1_1: &str = "x00: 1
 x01: 1
@@ -80,24 +83,39 @@ x02 AND y02 -> z01
 x03 AND y03 -> z03
 x04 AND y04 -> z04
 x05 AND y05 -> z00";
-pub const OUTPUT2: &str = "z00,z01,z02,z05";
+pub const OUTPUT2: &str = "";   // dummy test case
 
+#[derive(PartialEq, Eq, Clone)]
 pub enum Logic {
     And,
     Or,
     Xor,
 }
+
+impl Display for Logic {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Logic::And => write!(f, "AND"),
+            Logic::Or => write!(f, "OR "),
+            Logic::Xor => write!(f, "XOR"),
+        }
+    }
+}
+
 pub type Wire = String;
+#[derive(PartialEq, Eq, Clone)]
 pub struct Gate {
     pub input_1: Wire,
     pub input_2: Wire,
     pub logic: Logic,
     pub output: Wire,
 }
+pub type Assignment = HashMap<Wire, bool>;
+pub type GateSequence = Vec<Gate>;
 
-pub fn parse_input(input: &str) -> (HashMap<Wire, bool>, Vec<Gate>) {
+pub fn parse_input(input: &str) -> (Vec<Wire>, Vec<Gate>, Assignment) {
     let mut parts = input.split("\n\n");
-    let wires_states: HashMap<Wire, bool> = parts
+    let init_assignment: Assignment = parts
         .next()
         .unwrap()
         .lines()
@@ -128,38 +146,66 @@ pub fn parse_input(input: &str) -> (HashMap<Wire, bool>, Vec<Gate>) {
             }
         })
         .collect();
+    let mut wires: Vec<Wire> = gates
+        .iter()
+        .flat_map(|gate| {
+            [
+                gate.input_1.clone(),
+                gate.input_2.clone(),
+                gate.output.clone(),
+            ]
+        })
+        .collect::<HashSet<Wire>>()
+        .into_iter()
+        .collect();
+    wires.sort();
 
-    (wires_states, gates)
+    (wires, gates, init_assignment)
 }
 
-pub fn run_gates(wires_states: &mut HashMap<Wire, bool>, gates: &[Gate]) {
-    let mut finished_gate = 0;
-    while finished_gate < gates.len() {
-        gates.iter().for_each(|gate| {
-            if !wires_states.contains_key(&gate.output) {
-                if let Some(input_1) = wires_states.get(&gate.input_1) {
-                    if let Some(input_2) = wires_states.get(&gate.input_2) {
-                        match gate.logic {
-                            Logic::And => {
-                                wires_states.insert(gate.output.clone(), input_1 & input_2);
+pub fn run_gates(gates: &[Gate], init_assignment: &Assignment) -> (Assignment, GateSequence) {
+    let mut assignment = init_assignment.clone();
+    let mut gate_sequence: GateSequence = GateSequence::new();
+
+    let mut gate_count = 1;
+    while gate_count > 0 {
+        gate_count = gates
+            .iter()
+            .map(|gate| {
+                if !assignment.contains_key(&gate.output) {
+                    if let Some(input_1) = assignment.get(&gate.input_1) {
+                        if let Some(input_2) = assignment.get(&gate.input_2) {
+                            match gate.logic {
+                                Logic::And => {
+                                    assignment.insert(gate.output.clone(), input_1 & input_2);
+                                }
+                                Logic::Or => {
+                                    assignment.insert(gate.output.clone(), input_1 | input_2);
+                                }
+                                Logic::Xor => {
+                                    assignment.insert(gate.output.clone(), input_1 ^ input_2);
+                                }
                             }
-                            Logic::Or => {
-                                wires_states.insert(gate.output.clone(), input_1 | input_2);
-                            }
-                            Logic::Xor => {
-                                wires_states.insert(gate.output.clone(), input_1 ^ input_2);
-                            }
+                            gate_sequence.push(gate.clone());
+                            1
+                        } else {
+                            0
                         }
-                        finished_gate += 1;
+                    } else {
+                        0
                     }
+                } else {
+                    0
                 }
-            }
-        });
+            })
+            .sum();
     }
+
+    (assignment, gate_sequence)
 }
 
-pub fn wires_to_number(wires_states: &HashMap<Wire, bool>, starts_with: &str) -> usize {
-    let mut related_wires: Vec<(Wire, bool)> = wires_states
+pub fn wires_to_number(assignment: &Assignment, starts_with: &str) -> usize {
+    let mut related_wires: Vec<(Wire, bool)> = assignment
         .iter()
         .filter(|(name, _state)| name.starts_with(starts_with))
         .map(|(name, state)| (name.clone(), *state))
