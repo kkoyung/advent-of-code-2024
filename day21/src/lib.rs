@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use itertools::Itertools;
+use std::collections::{BTreeMap, HashMap};
 
 pub const INPUT1: &str = "029A
 980A
@@ -9,7 +9,7 @@ pub const INPUT1: &str = "029A
 pub const OUTPUT1: usize = 126384;
 
 pub const INPUT2: &str = INPUT1;
-pub const OUTPUT2: usize = 0;
+pub const OUTPUT2: usize = 154115708116294; // Not provided by the question
 
 #[derive(Clone, Copy)]
 struct Position(usize, usize);
@@ -109,8 +109,8 @@ impl Layout {
 }
 
 pub trait Keypad {
-    fn cost_of_key_press(&self, arm: char, key: char) -> usize;
-    fn cost_of_sequence(&self, sequence: &[char]) -> usize;
+    fn cost_of_key_press(&mut self, arm: char, key: char) -> usize;
+    fn cost_of_sequence(&mut self, sequence: &[char]) -> usize;
 }
 
 pub struct HumanKeypad {
@@ -124,40 +124,50 @@ impl HumanKeypad {
 }
 
 impl Keypad for HumanKeypad {
-    fn cost_of_key_press(&self, _arm: char, _key: char) -> usize {
+    fn cost_of_key_press(&mut self, _arm: char, _key: char) -> usize {
         1
     }
 
-    fn cost_of_sequence(&self, sequence: &[char]) -> usize {
+    fn cost_of_sequence(&mut self, sequence: &[char]) -> usize {
         sequence.len()
     }
 }
 
-pub struct RobotKeypad<T: Keypad> {
+pub struct RobotKeypad {
     layout: Layout,
-    upstream_keypad: T,
+    upstream_keypad: Box<dyn Keypad>,
+    cache: HashMap<(char, char), usize>,
 }
 
-impl<T: Keypad> RobotKeypad<T> {
-    pub fn new(layout: Layout, upstream_keypad: T) -> RobotKeypad<T> {
+impl RobotKeypad {
+    pub fn new(layout: Layout, upstream_keypad: Box<dyn Keypad>) -> RobotKeypad {
         RobotKeypad {
             layout,
             upstream_keypad,
+            cache: HashMap::new(),
         }
     }
 }
 
-impl<T: Keypad> Keypad for RobotKeypad<T> {
-    fn cost_of_key_press(&self, arm: char, key: char) -> usize {
-        self.layout
-            .possible_move_sequences(arm, key)
-            .iter()
-            .map(|sequence| self.upstream_keypad.cost_of_sequence(sequence))
-            .min()
-            .unwrap()
+impl Keypad for RobotKeypad {
+    fn cost_of_key_press(&mut self, arm: char, key: char) -> usize {
+        match self.cache.get(&(arm, key)) {
+            Some(cost) => *cost,
+            None => {
+                let cost = self
+                    .layout
+                    .possible_move_sequences(arm, key)
+                    .iter()
+                    .map(|sequence| self.upstream_keypad.cost_of_sequence(sequence))
+                    .min()
+                    .unwrap();
+                self.cache.insert((arm, key), cost);
+                cost
+            }
+        }
     }
 
-    fn cost_of_sequence(&self, sequence: &[char]) -> usize {
+    fn cost_of_sequence(&mut self, sequence: &[char]) -> usize {
         let mut padded_sequence = vec!['A'];
         padded_sequence.extend(sequence);
         padded_sequence

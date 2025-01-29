@@ -4,10 +4,10 @@ use std::fs;
 fn process(input: &str) -> usize {
     let codes: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
-    let fourth_keypad = HumanKeypad::new(Layout::new_directional());
-    let third_keypad = RobotKeypad::new(Layout::new_directional(), fourth_keypad);
-    let second_keypad = RobotKeypad::new(Layout::new_directional(), third_keypad);
-    let first_keypad = RobotKeypad::new(Layout::new_numeric(), second_keypad);
+    let fourth_keypad = Box::new(HumanKeypad::new(Layout::new_directional()));
+    let third_keypad = Box::new(RobotKeypad::new(Layout::new_directional(), fourth_keypad));
+    let second_keypad = Box::new(RobotKeypad::new(Layout::new_directional(), third_keypad));
+    let mut first_keypad = Box::new(RobotKeypad::new(Layout::new_numeric(), second_keypad));
 
     codes
         .iter()
